@@ -1,0 +1,30 @@
+//Gap Force Control
+//
+//Calc constant data
+AlfaRad := RAD(Data.Alfa);
+BetaRad := RAD(Data.Beta);
+Data.SinAlfa := SIN(AlfaRad);//0.7071068;
+Data.CosAlfaBeta := COS((AlfaRad - BetaRad));
+Data.F_Preload := Data.PreloadChamberArea / 100.0 * Data.PreloadPressure * Data.CosAlfaBeta;
+
+// Formula SIG
+//Calcolo forza gomma Fg
+//Data.FlamCalcWs := (MoogActForceWs - Data.F_Preload + (Data.Fpr2Ws * Data.SinAlfa) - Data.KWs - Data.FaWs) / 100.0; //100 adjust kg to kN
+//Data.FlamCalcDs := (MoogActForceDs - Data.F_Preload + (Data.Fpr2Ds * Data.SinAlfa) - Data.KDs - Data.FaDs) / 100.0; //100 adjust kg to kN
+
+//Calcolo soglie forza Moog
+//Data.FmGapForceMinForClosingWS := ((GapForceMinForClosingWs * 100.0) + Data.F_Preload - (Data.Fpr2Ws * Data.SinAlfa) + Data.FaWs + Data.KWs); //100 adjust kg to kN
+//Data.FmGapForceMinForClosingDS := ((GapForceMinForClosingDs * 100.0) + Data.F_Preload - (Data.Fpr2Ds * Data.SinAlfa) + Data.FaDs + Data.KDs); //100 adjust kg to kN
+//Data.FmGapForceThreshHydrosafeWS := ((GapForceThreshHydrosafeWs * 100.0) + Data.F_Preload - (Data.Fpr2Ws * Data.SinAlfa) + Data.FaWs + Data.KWs); //100 adjust kg to kN
+//Data.FmGapForceThreshHydrosafeDS := ((GapForceThreshHydrosafeDs * 100.0) + Data.F_Preload - (Data.Fpr2Ds * Data.SinAlfa) + Data.FaDs + Data.KDs); //100 adjust kg to kN
+
+// Formula In Specifica
+//Calcolo forza gomma Fg
+Data.FlamCalcWs := ((MoogActForceWs - (Data.B * Data.Paa) + (Data.C * Data.Fpr2Ws) - Data.KWs) * Data.D) / 100.0; //100 adjust kg to kN
+Data.FlamCalcDs := ((MoogActForceDs - (Data.B * Data.Paa) + (Data.C * Data.Fpr2Ds) - Data.KDs) * Data.D) / 100.0; //100 adjust kg to kN
+
+//Calcolo soglie forza Moog
+Data.FmGapForceMinForClosingWS := ((GapForceMinForClosingWs * 100.0) + (Data.B * Data.Paa) - (Data.C * Data.Fpr2Ws) + Data.KWs); //100 adjust kg to kN
+Data.FmGapForceMinForClosingDS := ((GapForceMinForClosingDs * 100.0) + (Data.B * Data.Paa) - (Data.C * Data.Fpr2Ws) +  Data.KDs); //100 adjust kg to kN
+Data.FmGapForceThreshHydrosafeWS := ((GapForceThreshHydrosafeWs * 100.0) + (Data.B * Data.Paa) - (Data.C * Data.Fpr2Ws) + Data.KWs); //100 adjust kg to kN
+Data.FmGapForceThreshHydrosafeDS := ((GapForceThreshHydrosafeDs * 100.0) + (Data.B * Data.Paa) - (Data.C * Data.Fpr2Ws) + Data.KDs); //100 adjust kg to kN
