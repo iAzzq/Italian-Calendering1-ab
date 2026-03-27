@@ -1,0 +1,32 @@
+//Filter Average
+//03/04/2014
+//V1.0
+
+Size(Sample,0,BufferSize);
+
+Sum:=0;
+IF InitValueReq THEN
+    FOR Index := (BufferSize-1) TO 0 BY -1 DO
+        Sample[Index]:=InitValue;
+    END_FOR;
+END_IF;
+
+IF (SampleNum < 2) THEN
+	SampleNum:=2;
+END_IF;
+IF (SampleNum > BufferSize) THEN
+	SampleNum:=BufferSize;
+END_IF;
+
+FOR Index := (BufferSize-1) TO 1 BY -1 DO
+    Sample[Index]:=Sample[Index-1];
+    IF (Index < SampleNum) THEN
+        IF (Index > 1) THEN
+			Sum:=Sum + Sample[Index];
+		ELSE
+			Sum:=Sum + Sample[Index] +Sample[0];
+		END_IF;
+    END_IF;
+END_FOR;
+Sample[0]:=InValue;
+OutValue:=Sum / (SampleNum);
