@@ -1,0 +1,36 @@
+//Endoer Pulses Difference
+//01/04/2014
+//V1.0
+//Magat
+//
+EncoderData.CountActValue:=EncoderValue;
+EncoderData.CountDifferenceValue:=0;
+EncoderData.LenghtDifferenceValueM:=0;
+EncoderData.CountDifferenceValueDINT:=0;
+
+IF EncoderData.CalcEnable THEN
+	EncoderData.CountDifferenceValue:=EncoderData.CountActValue - EncoderData.CountPrevValue;
+	App_Diff:=EncoderData.CountDifferenceValue * EncoderData.K_AdjustToMm;
+
+	//verifica se la differenza è maggiore del minimo accumulabile
+	//fissata al momento ad un decimo della scala di conteggio
+	//se sono metri, allora dm
+	//se sono decimetri, allora cm
+	//e così via, sempre un decimo
+      
+	IF ((ABS(App_Diff)) >= 0.1) THEN
+		EncoderData.CountDifferenceValueDINT:=TRUNC(App_Diff / 0.1);
+		EncoderData.LenghtDifferenceValueM:=EncoderData.CountDifferenceValueDINT * 0.1;
+		EncoderData.CountPrevValue:=EncoderData.CountPrevValue + (EncoderData.LenghtDifferenceValueM / EncoderData.K_AdjustToMm);
+	END_IF;
+
+//anvan 30-10-2014
+//quando l'encoder è passato per lo zero il calcolo è diventato un numero esagerato
+	IF ((ABS(EncoderData.LenghtDifferenceValueM)) >= 100) THEN
+		EncoderData.LenghtDifferenceValueM:=0;
+	END_IF;
+//end anvan
+
+ELSE
+	EncoderData.CountPrevValue:=EncoderData.CountActValue;
+END_IF;
