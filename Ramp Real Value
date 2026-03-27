@@ -1,0 +1,32 @@
+//Ramp Real Value
+//18/03/2014
+//V1.0
+//Magat
+//
+
+IF (Input <> Output) THEN
+	IF (Input < Output) THEN
+		//Decrease Value
+		IF (TimeDn <> 0) THEN
+			Output:= Output - (ScanTime / TimeDn * EndScale / 1000);
+			IF (Output < Input)	THEN
+				Output:=Input;
+			END_IF;
+		ELSE
+			Output:=Input;
+		END_IF;
+	ELSE
+		//Increase Value
+		IF (TimeUp <> 0) THEN
+			Output:= Output + (ScanTime / TimeUp * EndScale / 1000);
+			IF (Output > Input)	THEN
+				Output:=Input;
+			END_IF;
+		ELSE
+			Output:=Input;
+		END_IF;
+	END_IF;
+	RampOn:=1;
+ELSE
+	RampOn:=0;
+END_IF;
