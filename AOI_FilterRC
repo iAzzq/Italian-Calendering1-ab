@@ -1,0 +1,4 @@
+//OUT = I(t)*ALPHA + I(t-1) * (1-ALPHA)
+//1 = no filter (output = input with 0 delay time) 
+//0 = infinity filter (output never follow the input) 
+Output:= (Input * KFilter) + (Output * (1 - KFilter));
