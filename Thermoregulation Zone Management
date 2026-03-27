@@ -1,0 +1,57 @@
+//Thermoregulation Zone Management
+//10/04/2014
+//V1.0
+//Magat
+//
+ZoneOnOns:= ZoneOn & NOT AuxZoneOnOns;
+AuxZoneOnOns:= ZoneOn;
+
+
+// Max Temperature Alarm
+IF (ActTemp > MaxTemp) AND ZoneOn THEN
+	AlMaxTemp:=1;
+ELSE
+	AlMaxTemp:=0;
+END_IF;
+
+// Out of Tolerance Alarm
+IF (ABS(ActSp - ActTemp) > TempTol) AND ZoneOn THEN
+	AlOutTolerance:=1;
+ELSE
+	AlOutTolerance:=0;
+END_IF;
+
+
+if ZoneOn THEN
+	//Sp Update
+	IF ZoneOnOns OR (TempSp <> WorkSp) THEN 
+		ActSp:= ActTemp;
+	
+		IF (TempSp <= MaxTemp) THEN
+			WorkSp:= TempSp;
+		ELSE
+			WorkSp:= MaxTemp;
+		END_IF;
+	END_IF;
+
+	//Decrease
+	IF ActSp > WorkSp THEN
+		IF Clock1Sec THEN
+			ActSp:= ActSp - (RampRatio / 60);	//60s 
+			IF ActSp < WorkSp THEN 
+				ActSp:= WorkSp;
+			END_IF;
+		END_IF;
+	END_IF;
+
+	//Increase
+	IF ActSp < WorkSp THEN
+		IF ((ActSp - ActTemp) < 5) & Clock1Sec & RampEnable THEN		// if (ActSp - ActTemp) is lower then 5 °C ramp enable,otherwise ramp stop!
+			ActSp:= ActSp + (RampRatio / 60);
+			IF ActSp > WorkSp THEN
+				ActSp:= WorkSp;
+			END_IF;
+		END_IF;
+	END_IF;
+END_IF;
+
