@@ -1,0 +1,61 @@
+//MotorTorqueCalc
+//Calcolo coppia motore [%] in funzione del diametro e del tiro
+//22/04/2014
+//V1.0
+//Magat
+//
+//Diameter Percentual
+SvdData.DiameterPerc:= (BobbinDiameter - SvdData.MinDiameter) / (SvdData.MaxDiameter - SvdData.MinDiameter)* 100;
+
+//Taper Limit and Actual SP Calculation
+IF Taper<SvdData.MinTaper THEN
+    Taper:=SvdData.MinTaper;
+END_IF;
+IF Taper>SvdData.MaxTaper THEN
+    Taper:=SvdData.MaxTaper;
+END_IF;
+
+SvdData.ActTensionSp:= TensionSet * (1 - (Taper/100 * SvdData.DiameterPerc/100));
+
+//Calculation of K convertion with Motor Data
+IF SvdData.DataCalc1 & SvdData.DataCalc2 THEN
+    SvdData.DataCalc1:=0;
+    SvdData.DataCalc2:=0;
+    SvdData.MotorTorque:=9550 * SvdData.MotorPower / SvdData.MotorSpeed;
+    SvdData.BobbinTorque:=SvdData.MotorTorque * SvdData.GearRatio;
+    SvdData.BobbinMaxTensMinDiam:= ((SvdData.BobbinTorque * 2) / (SvdData.MinDiameter / 1000));
+    SvdData.BobbinMaxTensMaxDiam:= ((SvdData.BobbinTorque * 2) / (SvdData.MaxDiameter / 1000));
+
+    IF SpMeasureUnit THEN
+        SvdData.BobbinMaxTensMinDiam:= SvdData.BobbinMaxTensMinDiam / 10;
+        SvdData.BobbinMaxTensMaxDiam:= SvdData.BobbinMaxTensMaxDiam / 10;
+    END_IF;    
+
+    SvdData.KAdjust:=100 /(SvdData.BobbinMaxTensMaxDiam * SvdData.MaxDiameter);
+END_IF;
+ 
+//Torque Calculation
+SvdData.BaseTorque:=SvdData.ActTensionSp * BobbinDiameter * SvdData.KAdjust;
+SvdData.DynamicLoss:=(ABS(WindSpeed)) * SvdData.KDynamicLoss;
+TorqueRef:=SvdData.BaseTorque + SvdData.StaticLoss + SvdData.DynamicLoss;
+
+//Over Torque 
+IF NOT BreakTorqueReq THEN
+    IF NOT StartTorqueReq THEN
+        IF BoostTorqueReq THEN
+            TorqueRef:= TorqueRef * (1 + (SvdData.BoostTorque / 100));
+        END_IF;
+    ELSE
+        TorqueRef:= TorqueRef * (1 + (SvdData.StartTorque / 100));
+    END_IF;
+ELSE
+    TorqueRef:=TorqueRef * (1 + (SvdData.BreakingTorque / 100));
+END_IF;
+
+//Torque Limits Check
+IF TorqueRef<SvdData.MinTorque THEN
+    TorqueRef:=SvdData.MinTorque;
+END_IF;
+IF TorqueRef>SvdData.MaxTorque THEN
+    TorqueRef:=SvdData.MaxTorque;
+END_IF;
