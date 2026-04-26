@@ -59,3 +59,43 @@ END_IF;
 IF TorqueRef>SvdData.MaxTorque THEN
     TorqueRef:=SvdData.MaxTorque;
 END_IF;
+
+
+
+
+
+┌──────────────────────────────────────────────────────────────────┐
+│              电机扭矩计算程序 (MotorTorqueCalc) - I/O 图           │
+└──────────────────────────────────────────────────────────────────┘
+
+输入 (INPUTS)                              输出 (OUTPUTS)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+直接输入变量:                              主要输出:
+  • BobbinDiameter (卷筒直径)   ┐        ┌→ TorqueRef (扭矩参考值)
+  • Taper (锥度)                │        │
+  • TensionSet (张力设定)        │        中间输出:
+  • WindSpeed (卷绕速度)         │    ┌──┤→ SvdData.DiameterPerc
+  • BreakTorqueReq (制动请求)   │    │  │  (直径百分比)
+  • StartTorqueReq (启动请求)   ├────┼──┤
+  • BoostTorqueReq (增压请求)   │    │  ├→ SvdData.ActTensionSp
+  • SpMeasureUnit (单位标志)    │    │  │  (实际张力设定点)
+                                │    │  │
+SvdData 结构体参数:             │    │  ├→ SvdData.BaseTorque
+  • MinDiameter (最小直径)      │    │  │  (基础扭矩)
+  • MaxDiameter (最大直径)      │    │  │
+  • MinTaper (最小锥度)         │    │  ├→ SvdData.DynamicLoss
+  • MaxTaper (最大锥度)         │    │  │  (动态损耗)
+  • DataCalc1, DataCalc2        │    │  │
+  • MotorPower (电机功率)       │    │  ├→ SvdData.MotorTorque
+  • MotorSpeed (电机速度)       ├────┼──┤  (电机扭矩)
+  • GearRatio (齿轮比)          │    │  │
+  • KDynamicLoss (动态损耗系数)  │    │  ├→ SvdData.BobbinTorque
+  • StaticLoss (静态损耗)       │    │  │  (卷筒扭矩)
+  • BoostTorque (增压%)         │    │  │
+  • StartTorque (启动%)         │    │  ├→ SvdData.KAdjust
+  • BreakingTorque (制动%)      │    │  │  (调整系数)
+  • MinTorque (最小扭矩)        │    │  │
+  • MaxTorque (最大扭矩)        └────┴──┘  (限制值)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
